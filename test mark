@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Розіграш подарунків</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
+        h1 { text-align: center; }
+        ul { padding: 0; list-style: none; margin-bottom: 20px;}
+        li { background: #f3f3f3; margin: 4px 0; padding: 7px 14px; border-radius: 7px;}
+        button { padding: 12px 30px; font-size: 18px; border-radius: 7px; border: none; background: #3699f5; color: #fff; cursor: pointer;}
+        button[disabled] { opacity: 0.6; cursor: default;}
+        .winner { font-size: 22px; font-weight: bold; margin-top: 20px; text-align: center; color: #41b62a;}
+        .step { margin: 20px 0 10px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Розіграш подарунків</h1>
+    <div class="step" id="stepLabel">Крок 1: Список учасників</div>
+    <ul id="participants"></ul>
+    <div style="text-align:center;">
+        <button id="draw1" onclick="drawRandom(1)">Розіграти 1-й подарунок</button>
+        <button id="draw2" onclick="drawRandom(2)" disabled>Розіграти 2-й подарунок</button>
+        <button id="drawSpecial" onclick="drawSpecial()" disabled>Розіграти особливий подарунок</button>
+    </div>
+    <div class="winner" id="winner"></div>
+
+<script>
+// Додай учасників (ім'я, прізвище або як хочеш)
+const participants = [
+    "Іван Петренко",
+    "Олена Сидоренко",
+    "Марія Іванова",
+    "Павло Коваленко",
+    "Катерина Шевченко",
+    "Сергій Мельник",
+    "Юлія Бондар",
+    "АНДРІЙ ДМИТРЕНКО" // <-- Цей учасник отримає особливий подарунок!
+];
+
+const specialWinner = "АНДРІЙ ДМИТРЕНКО";
+let remaining = [...participants];
+let winners = [];
+
+function renderParticipants() {
+    const ul = document.getElementById('participants');
+    ul.innerHTML = '';
+    remaining.forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        ul.appendChild(li);
+    });
+}
+
+function drawRandom(number) {
+    if (remaining.length === 0) return;
+    // Видаляємо спеціального переможця з випадкового розіграшу
+    const filtered = remaining.filter(name => name !== specialWinner);
+    if (filtered.length === 0) return;
+
+    // Випадковий вибір
+    const index = Math.floor(Math.random() * filtered.length);
+    const winner = filtered[index];
+
+    winners.push(winner);
+    remaining = remaining.filter(name => name !== winner);
+
+    document.getElementById('winner').textContent = `Переможець ${number}-го подарунку: ${winner}`;
+    document.getElementById('stepLabel').textContent = `Крок ${number + 1}: Залишилось учасників`;
+
+    renderParticipants();
+
+    // Керування кнопками
+    if (number === 1) {
+        document.getElementById('draw1').disabled = true;
+        document.getElementById('draw2').disabled = false;
+    }
+    if (number === 2) {
+        document.getElementById('draw2').disabled = true;
+        document.getElementById('drawSpecial').disabled = false;
+    }
+}
+
+function drawSpecial() {
+    // Завжди виграє specialWinner!
+    winners.push(specialWinner);
+    remaining = remaining.filter(name => name !== specialWinner);
+    document.getElementById('winner').textContent = `Переможець особливого подарунку: ${specialWinner}`;
+    document.getElementById('stepLabel').textContent = `Розіграш завершено!`;
+    renderParticipants();
+    document.getElementById('drawSpecial').disabled = true;
+}
+
+renderParticipants();
+</script>
+</body>
+</html>
